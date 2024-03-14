@@ -1,0 +1,36 @@
+---
+- name: Collect PCAP file
+  hosts: all
+  gather_facts: true
+  become: yes
+  become_user: root
+  tasks:
+    - name: Collecting the PCAP file
+      fetch:
+        src: /home/daniela/Documents/PCAP/HOA8.1.pcap
+        dest: /home/daniela/Documents/HOA8.1/PCAP_dest/
+        flat: yes
+
+- name: Extract executable from PCAP file
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Extracting the executable from PCAP file
+      command: "tcpflow -r /home/daniela/Documents/HOA8.1/PCAP_dest/HOA8.1.pcap -o /home/daniela/Documents/HOA8.1/PCAP_out/"
+      args:
+        creates: /home/daniela/Documents/HOA8.1/PCAP_out/executable.exe
+
+- name: Debug .exe file creation
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: Debugging the .exe file that is created
+      command: "cat /home/daniela/Documents/HOA8.1/PCAP_out/report.xml"
+      register: cat_output
+      changed_when: false
+
+    - debug:
+        var: cat_output.stdout_lines
+
